@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG SYSTEM &mdash; Document Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="app-shell">
+  {% include "components/sidebar.html" %}
+
+  <div class="main-area">
+    {% include "components/navbar.html" %}
+
+    <div class="content">
+
+      {% if config_warnings %}
+      <div class="card" style="border-color: var(--color-warning); margin-bottom: 20px;">
+        {% for w in config_warnings %}
+          <p style="margin:0; font-size:13px;">&#9888;&#65039; {{ w }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- DASHBOARD VIEW -->
+      <section class="view active" id="view-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background: var(--color-primary-light); color: var(--color-primary-dark);">&#128196;</div>
+            <div class="stat-label">Total Documents</div>
+            <div class="stat-value" id="statDocuments">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(6,182,212,0.12); color: var(--color-accent);">&#128209;</div>
+            <div class="stat-label">Total Pages</div>
+            <div class="stat-value" id="statPages">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(22,163,74,0.12); color: var(--color-success);">&#129504;</div>
+            <div class="stat-label">Total Chunks</div>
+            <div class="stat-value" id="statChunks">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(217,119,6,0.12); color: var(--color-warning);">&#9203;</div>
+            <div class="stat-label">Processing</div>
+            <div class="stat-value" id="statProcessing">0</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="section-title">Quick Upload</div>
+            <div class="dropzone" id="dashDropzone">
+              <div class="dropzone-icon">&#8593;</div>
+              <div class="dropzone-title">Drag &amp; drop files here</div>
+              <div class="dropzone-sub">PDF, TXT, Markdown, DOCX &middot; or click to browse</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="section-title">Recent Documents</div>
+            <div class="doc-list" id="recentDocList">
+              <div class="empty-state">No documents uploaded yet.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- UPLOAD VIEW -->
+      <section class="view" id="view-upload">
+        <div class="card">
+          <div class="section-title">Upload Documents</div>
+          <div class="dropzone" id="uploadDropzone">
+            <div class="dropzone-icon">&#8593;</div>
+            <div class="dropzone-title">Drag &amp; drop files here, or click to browse</div>
+            <div class="dropzone-sub">Supports PDF, TXT, Markdown, DOCX &middot; up to 25MB each</div>
+          </div>
+          <div class="upload-queue" id="uploadQueue"></div>
+        </div>
+      </section>
+
+      <!-- CHAT VIEW -->
+      <section class="view" id="view-chat">
+        <div class="grid-2">
+          <div class="card chat-panel">
+            <div class="chat-messages" id="chatMessages">
+              <div class="empty-state" id="chatEmptyState">
+                Ask a question about your uploaded documents to get started.
+              </div>
+            </div>
+            <div id="suggestedQuestionsBox" class="suggested-questions"></div>
+            <div class="chat-input-bar">
+              <textarea id="chatInput" rows="1" placeholder="Ask a question about your documents..."></textarea>
+              <button class="btn btn-primary" id="sendBtn">Send</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="section-title">Conversation Controls</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <label style="font-size:12px; font-weight:600; color: var(--color-text-muted);">Filter by document</label>
+              <select id="documentFilter" style="padding:8px; border-radius:8px; border:1px solid var(--color-border); background: var(--color-surface-alt); color: var(--color-text);">
+                <option value="">All documents</option>
+              </select>
+              <button class="btn btn-secondary" id="clearChatBtn">Clear chat</button>
+              <button class="btn btn-secondary" id="exportChatBtn">Export chat (.json)</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DOCUMENTS VIEW -->
+      <section class="view" id="view-documents">
+        <div class="card">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <div class="section-title" style="margin:0;">Document Library</div>
+            <button class="btn btn-secondary" id="refreshEmbeddingsBtn">Refresh Embeddings</button>
+          </div>
+          <div class="doc-list" id="fullDocList">
+            <div class="empty-state">No documents uploaded yet.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- USAGE VIEW -->
+      <section class="view" id="view-usage">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Requests</div>
+            <div class="stat-value" id="usageRequests">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Input Tokens</div>
+            <div class="stat-value" id="usageInputTokens">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Output Tokens</div>
+            <div class="stat-value" id="usageOutputTokens">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Est. Cost (USD)</div>
+            <div class="stat-value" id="usageCost">$0.00</div>
+          </div>
+        </div>
+        <div class="card">
+          <p style="font-size:12px; color: var(--color-text-muted);">
+            Token counts are approximate (based on a cl100k-style tokenizer) and cost is
+            estimated using public reference pricing. Use for relative tracking, not billing.
+          </p>
+        </div>
+      </section>
+
+    </div>
+
+    {% include "components/footer.html" %}
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

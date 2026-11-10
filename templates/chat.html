@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat &mdash; RAG SYSTEM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+<div class="app-shell">
+  {% include "components/sidebar.html" %}
+  <div class="main-area">
+    {% include "components/navbar.html" %}
+    <div class="content">
+      <div class="grid-2">
+        <div class="card chat-panel">
+          <div class="chat-messages" id="chatMessages">
+            <div class="empty-state" id="chatEmptyState">
+              Ask a question about your uploaded documents to get started.
+            </div>
+          </div>
+          <div id="suggestedQuestionsBox" class="suggested-questions"></div>
+          <div class="chat-input-bar">
+            <textarea id="chatInput" rows="1" placeholder="Ask a question about your documents..."></textarea>
+            <button class="btn btn-primary" id="sendBtn">Send</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">Conversation Controls</div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <label style="font-size:12px; font-weight:600; color: var(--color-text-muted);">Filter by document</label>
+            <select id="documentFilter" style="padding:8px; border-radius:8px; border:1px solid var(--color-border); background: var(--color-surface-alt); color: var(--color-text);">
+              <option value="">All documents</option>
+            </select>
+            <button class="btn btn-secondary" id="clearChatBtn">Clear chat</button>
+            <button class="btn btn-secondary" id="exportChatBtn">Export chat (.json)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% include "components/footer.html" %}
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+<script>
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => { window.location.href = '/'; });
+});
+</script>
+</body>
+</html>

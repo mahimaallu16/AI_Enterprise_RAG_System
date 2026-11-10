@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload &mdash; Enterprise RAG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+<div class="app-shell">
+  {% include "components/sidebar.html" %}
+  <div class="main-area">
+    {% include "components/navbar.html" %}
+    <div class="content">
+      <div class="card">
+        <div class="section-title">Upload Documents</div>
+        <div class="dropzone" id="uploadDropzone">
+          <div class="dropzone-icon">&#8593;</div>
+          <div class="dropzone-title">Drag &amp; drop files here, or click to browse</div>
+          <div class="dropzone-sub">Supports PDF, TXT, Markdown, DOCX &middot; up to 25MB each</div>
+        </div>
+        <div class="upload-queue" id="uploadQueue"></div>
+      </div>
+    </div>
+    {% include "components/footer.html" %}
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+<script>
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => { window.location.href = '/'; });
+});
+</script>
+</body>
+</html>

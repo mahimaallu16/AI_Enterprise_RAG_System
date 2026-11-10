@@ -1,0 +1,15 @@
+flask>=3.0.0
+python-dotenv>=1.0.0
+langchain>=0.2.0
+langchain-text-splitters>=0.2.0
+langchain-community>=0.2.0
+langchain-google-genai>=2.0.0
+langchain-huggingface>=0.0.3
+chromadb>=0.5.0
+sentence-transformers>=2.7.0
+pypdf>=4.2.0
+python-docx>=1.1.0
+unstructured>=0.14.0
+markdown>=3.6
+tiktoken>=0.7.0
+werkzeug>=3.0.0
