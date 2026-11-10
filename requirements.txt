@@ -13,3 +13,4 @@ unstructured>=0.14.0
 markdown>=3.6
 tiktoken>=0.7.0
 werkzeug>=3.0.0
+gunicorn
